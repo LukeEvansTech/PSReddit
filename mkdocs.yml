@@ -21,7 +21,8 @@ site_author: Luke Evans # meta tag to the generated HTML header
 # remote_name:
 # docs_dir: docs
 # site_dir:
-# extra_css:
+extra_css:
+  - stylesheets/extra.css
 # extra_javascript:
 markdown_extensions:
   # Python Markdown
@@ -56,18 +57,14 @@ theme:
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: light blue # Set light mode primary color
-      accent: pink        # Optional accent color
+      scheme: alucard-light # Use custom light scheme
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
 
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: indigo     # Optional dark mode primary color (can be customized)
-      accent: pink        # Optional accent color
+      scheme: dracula-dark  # Use custom dark scheme
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
