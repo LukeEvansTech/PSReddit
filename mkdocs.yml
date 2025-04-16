@@ -9,7 +9,7 @@
 # mkdocs.yml
 
 site_name: PSReddit
-# site_url:
+site_url: https://LukeEvansTech.github.io/PSReddit/
 # repo_url:
 # repo_name:
 # edit_uri: edit/main/docs/
