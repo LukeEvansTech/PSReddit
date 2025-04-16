@@ -1,0 +1,27 @@
+name: Deploy MkDocs Site
+
+on:
+  push:
+    branches:
+      - main # Or your default branch name (e.g., master)
+
+permissions:
+  contents: write # Needed to push to gh-pages branch
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x" # Use a recent Python 3 version
+
+      - name: Install dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force --clean
