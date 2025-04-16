@@ -10,8 +10,8 @@
 
 site_name: PSReddit
 site_url: https://LukeEvansTech.github.io/PSReddit/
-# repo_url:
-# repo_name:
+repo_url: https://github.com/LukeEvansTech/PSReddit/
+repo_name: LukeEvansTech/PSReddit
 # edit_uri: edit/main/docs/
 # edit_uri_template:
 site_description: PSReddit is a cross-platform PowerShell 7+ module for interacting  with the Reddit API # meta tag to the generated HTML header
@@ -23,19 +23,19 @@ site_author: Luke Evans # meta tag to the generated HTML header
 # site_dir:
 # extra_css:
 # extra_javascript:
-# markdown_extensions:
+markdown_extensions:
   # Python Markdown
-  # - admonition
-  # - toc:
-  #     permalink: true
-  # code highlighting
-  # - pymdownx.highlight:
-  #     use_pygments: true
-  # - pymdownx.highlight:
-  #     anchor_linenums: true
-  # - pymdownx.inlinehilite
-  # - pymdownx.snippets
-  # - pymdownx.superfences
+  - admonition
+  - toc:
+      permalink: true
+  # Code highlighting - requires Pygments
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
 
 # extra_templates:
 # extra:
@@ -48,35 +48,32 @@ theme:
     # - navigation.tabs.sticky
     # - navigation.path
   # favicon:
-  # icon:
-  #   repo:
+  icon:
+    repo: fontawesome/brands/github # Or fontawesome/brands/git-alt
   # font:
   #   text: Work Sans
   # logo:
-  # palette:
-  #   primary: teal
-  # palette:
-  #   # Palette toggle for light mode
-  #   - media: "(prefers-color-scheme: light)"
-  #     scheme: default
-  #     primary: light blue
-  #     accent: pink
-  #     toggle:
-  #       icon: material/brightness-7
-  #       name: Switch to dark mode
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: light blue # Set light mode primary color
+      accent: pink        # Optional accent color
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
 
-    # # Palette toggle for dark mode
-    # - media: "(prefers-color-scheme: dark)"
-    #   scheme: slate
-    #   primary: indigo
-    #   accent: pink
-    #   toggle:
-    #     icon: material/brightness-4
-    #     name: Switch to light mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo     # Optional dark mode primary color (can be customized)
+      accent: pink        # Optional accent color
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 nav:
   - Home: index.md
   - Change Log: CHANGELOG.md
   - Development: DEVELOPMENT.md
   # - Functions:
   #   - Function1: functions/function1.md
-
