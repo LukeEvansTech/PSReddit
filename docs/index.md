@@ -34,6 +34,12 @@ Get-RedditPost -Subreddit 'PowerShell' -Limit 10
 
 ```
 
+## Cmdlet Reference
+
+- [Get-RedditOAuthToken](Get-RedditOAuthToken.md) – Retrieves an OAuth2 bearer token from Reddit.
+- [Get-RedditPost](Get-RedditPost.md) – Retrieves posts from one or more subreddits.
++For full details including parameter tables and usage examples, refer to each cmdlet’s documentation page.
+
 ## Author
 
 Luke Evans

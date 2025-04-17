@@ -41,7 +41,28 @@ Get-RedditPosts -Subreddit 'powershell' -Sort New -Count 10
 Get-RedditPosts -Subreddit 'powershell' -Sort Top -LastWeek
 ```
 
+### EXAMPLE 3
+
+```powershell
+Get-RedditPost -Subreddit 'PowerShell','PowerBI' -Sort Top -LastWeek -Count 10
+```
+
 ## PARAMETERS
+
+### Parameter Table
+
+| Parameter     | Type            | Required | Default | Description                                                          |
+|---------------|-----------------|----------|---------|----------------------------------------------------------------------|
+| -Subreddit    | String[]        | True     | None    | Subreddit names without `/r/`.                                       |
+| -Sort         | String          | False    | Top     | Sort type: Top, New, Rising, Hot, Controversial.                     |
+| -LastHour     | SwitchParameter | False    | False   | Retrieve posts from the last hour (Top/Controversial only).          |
+| -LastDay      | SwitchParameter | False    | False   | Retrieve posts from the last day (Top/Controversial only).           |
+| -LastWeek     | SwitchParameter | False    | False   | Retrieve posts from the last week (Top/Controversial only).          |
+| -LastMonth    | SwitchParameter | False    | False   | Retrieve posts from the last month (Top/Controversial only).         |
+| -LastYear     | SwitchParameter | False    | False   | Retrieve posts from the last year (Top/Controversial only).          |
+| -AllTime      | SwitchParameter | False    | False   | Retrieve posts from all time (Top/Controversial only).               |
+| -Count        | Int32           | False    | 25      | Number of posts to retrieve per subreddit (max 100).                 |
+| -DebugApi     | SwitchParameter | False    | False   | Output verbose debugging information for API requests.               |
 
 ### -Subreddit
 

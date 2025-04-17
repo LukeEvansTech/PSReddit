@@ -10,9 +10,9 @@ Locale: en-US
 ## Description
 A PowerShell module (PSReddit) for authenticating with Reddit and retrieving posts.
 
-## PSReddit Cmdlets
-### [Get-RedditOAuthToken](Get-RedditOAuthToken.md)
-Retrieves an OAuth2 bearer token from Reddit.
+## Cmdlets
 
-### [Get-RedditPost](Get-RedditPost.md)
-Retrieves posts from one or more subreddits.
+| Cmdlet | Description |
+|--------|-------------|
+| [Get-RedditOAuthToken](Get-RedditOAuthToken.md) | Retrieves an OAuth2 bearer token from Reddit. |
+| [Get-RedditPost](Get-RedditPost.md) | Retrieves posts from one or more subreddits. |

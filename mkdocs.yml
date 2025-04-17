@@ -73,7 +73,11 @@ theme:
         name: Switch to light mode
 nav:
   - Home: index.md
-  - Change Log: CHANGELOG.md
+  - Cmdlets:
+      - Get-RedditOAuthToken: Get-RedditOAuthToken.md
+      - Get-RedditPost: Get-RedditPost.md
+  - Reference:
+      - Module Manifest: PSReddit.md
+  - Workflows: WORKFLOWS.md
   - Development: DEVELOPMENT.md
-  # - Functions:
-  #   - Function1: functions/function1.md
+  - Change Log: CHANGELOG.md
