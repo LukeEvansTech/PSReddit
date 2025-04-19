@@ -75,7 +75,8 @@ nav:
   - Home: index.md
   - Cmdlets:
       - Get-RedditOAuthToken: Get-RedditOAuthToken.md
-      - Get-RedditPost: Get-RedditPost.md
+      - Get-RedditSubredditPost: Get-RedditSubredditPost.md
+      - Get-RedditUserPost: Get-RedditUserPost.md
   - Reference:
       - Module Manifest: PSReddit.md
   - Workflows: WORKFLOWS.md
