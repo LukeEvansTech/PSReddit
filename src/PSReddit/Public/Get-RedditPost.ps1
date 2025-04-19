@@ -77,7 +77,7 @@ function Get-RedditPost {
         Write-Error 'Could not retrieve Reddit OAuth token.'
         return
     }
-    $headers = @{ Authorization = "bearer $token"; 'User-Agent' = 'PSReddit/0.1.0 (by u/yourusername)' }
+    $headers = @{ Authorization = "bearer $token"; 'User-Agent' = 'PSReddit/0.1.0 (by u/LukeEvansTech)' }
     $allPosts = @()
     foreach ($sub in $Subreddit) {
         $sortPath = if ($PSBoundParameters.ContainsKey('Sort') -and $Sort) { $Sort.ToLower() } else { 'new' }
@@ -98,7 +98,7 @@ function Get-RedditPost {
         $uri += "&api_type=json"
         if ($DebugApi) { Write-Verbose "[DEBUG] Requesting: $uri" }
         try {
-            $headers['User-Agent'] = 'PSReddit/0.1.0 (by u/yourusername on GitHub)'
+            $headers['User-Agent'] = 'PSReddit/0.1.0 (by u/LukeEvansTech on GitHub)'
             $response = Invoke-RestMethod -Uri $uri -Headers $headers -ErrorAction Stop
             if ($response.data.children) {
                 $posts = $response.data.children | ForEach-Object { [PSCustomObject]$_.data }
