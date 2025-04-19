@@ -5,7 +5,8 @@ BeforeAll {
     Get-Module $ModuleName -ErrorAction SilentlyContinue | Remove-Module -Force
     Import-Module $PathToManifest -Force
     $manifestContent = Test-ModuleManifest -Path $PathToManifest
-    $moduleExported = Get-Command -Module $ModuleName | Select-Object -ExpandProperty Name
+    # Get all exported functions
+    $moduleExported = Get-Command -Module $ModuleName -CommandType Function | Select-Object -ExpandProperty Name
     $manifestExported = ($manifestContent.ExportedFunctions).Keys
 }
 BeforeDiscovery {
@@ -13,7 +14,8 @@ BeforeDiscovery {
     $ModuleName = 'PSReddit'
     $PathToManifest = [System.IO.Path]::Combine('..', '..', $ModuleName, "$ModuleName.psd1")
     $manifestContent = Test-ModuleManifest -Path $PathToManifest
-    $moduleExported = Get-Command -Module $ModuleName | Select-Object -ExpandProperty Name
+    # Get all exported functions
+    $moduleExported = Get-Command -Module $ModuleName -CommandType Function | Select-Object -ExpandProperty Name
     $manifestExported = ($manifestContent.ExportedFunctions).Keys
 }
 Describe $ModuleName {
@@ -26,6 +28,8 @@ Describe $ModuleName {
                 $manifestExported.Count | Should -BeExactly $moduleExported.Count
             }
 
+
+
         }
 
         Context 'Explicitly exported commands' {
@@ -33,6 +37,8 @@ Describe $ModuleName {
             It 'Includes <_> in the Module Manifest ExportedFunctions' -ForEach $moduleExported {
                 $manifestExported -contains $_ | Should -BeTrue
             }
+
+
 
         }
     } #context_ExportedCommands
@@ -80,7 +86,7 @@ Describe $ModuleName {
             Remove-Item Env:\REDDIT_CLIENT_SECRET
         }
 
-        It 'Get-RedditPost should return posts (mocked)' {
+        It 'Get-RedditSubredditPost should return posts (mocked)' {
             # Mock Invoke-RestMethod specifically for the posts endpoint for this test
             Mock Invoke-RestMethod -ModuleName PSReddit -ParameterFilter { $Uri -like '*oauth.reddit.com*' } -MockWith {
                 Write-Verbose "Mocking Invoke-RestMethod for Posts Request: $Uri"
@@ -112,11 +118,36 @@ Describe $ModuleName {
             # Mock Get-RedditOAuthToken specifically for this test
             Mock Get-RedditOAuthToken -ModuleName PSReddit -MockWith { return 'mock_token_for_getpost' }
 
-            $posts = Get-RedditPost -Subreddit 'powershell' -Count 2
+            $posts = Get-RedditSubredditPost -Subreddit 'powershell' -Count 2
             $posts | Should -Not -BeNullOrEmpty
             $posts.Count | Should -Be 2
             $posts[0].title | Should -Be 'Mock Post 1'
             $posts[1].score | Should -Be 20
+        }
+
+        It 'Get-RedditUserPost should return user posts (mocked)' {
+            # Mock Invoke-RestMethod specifically for the user posts endpoint
+            Mock Invoke-RestMethod -ModuleName PSReddit -ParameterFilter { $Uri -like '*oauth.reddit.com/user/*' } -MockWith {
+                Write-Verbose "Mocking Invoke-RestMethod for User Posts Request: $Uri"
+                # Simulate successful user post retrieval
+                return @{
+                    data = @{
+                        children = @(
+                            @{ data = @{ title = 'User Post 1'; score = 15; id = 'up1' } }
+                            @{ data = @{ title = 'User Post 2'; score = 25; id = 'up2' } }
+                        )
+                    }
+                }
+            }
+
+            # Mock Get-RedditOAuthToken specifically for this test
+            Mock Get-RedditOAuthToken -ModuleName PSReddit -MockWith { return 'mock_token_for_userpost' }
+
+            $posts = Get-RedditUserPost -Username 'LukeEvansTech' -Count 2
+            $posts | Should -Not -BeNullOrEmpty
+            $posts.Count | Should -Be 2
+            $posts[0].title | Should -Be 'User Post 1'
+            $posts[1].score | Should -Be 25
         }
     } #context_FunctionLogic
 }

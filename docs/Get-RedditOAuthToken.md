@@ -29,20 +29,7 @@ Authenticates with Reddit using client credentials from environment variables (R
 $token = Get-RedditOAuthToken
 ```
 
-### EXAMPLE 2
-```powershell
-$env:REDDIT_CLIENT_ID = 'YOUR_CLIENT_ID'
-$env:REDDIT_CLIENT_SECRET = 'YOUR_CLIENT_SECRET'
-$token = Get-RedditOAuthToken
-```
-
 ## PARAMETERS
-
-### Parameter Table
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| <none>    | N/A  | N/A      | Uses environment variables for credentials. |
 
 ### CommonParameters
 
@@ -56,12 +43,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 ## NOTES
 
 Requires environment variables REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET to be set.
-
-## Environment Variables
-
-| Variable             | Description                         |
-|----------------------|-------------------------------------|
-| REDDIT_CLIENT_ID     | Your Reddit API Client ID.         |
-| REDDIT_CLIENT_SECRET | Your Reddit API Client Secret.     |
 
 ## RELATED LINKS

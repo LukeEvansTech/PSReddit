@@ -7,11 +7,13 @@
 # https://github.com/actions/upload-artifact#where-does-the-upload-go
 name: "PSReddit - Test on Linux"
 on:
-  pull_request:
+  push:
+    branches:
+      - main
     paths-ignore:
       - '**.md'
       - 'docs/**'
-  push:
+  pull_request:
     paths-ignore:
       - '**.md'
       - 'docs/**'

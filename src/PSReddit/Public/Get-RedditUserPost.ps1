@@ -1,20 +1,18 @@
 <#
 .SYNOPSIS
-    Retrieves posts from one or more subreddits.
+    Retrieves posts submitted by specific Reddit users.
 .DESCRIPTION
-    Uses Reddit's API and OAuth2 to fetch posts from specified subreddit(s).
-    You can specify the sort type (Top, New, Rising, Hot, Controversial).
-    Timeframe switches (-LastHour, -LastDay, etc.) only apply to 'Top' and 'Controversial' sorts, per Reddit API rules.
-    Only one timeframe or sort can be used per call, as the Reddit API does not support combining them.
-    Use -Count to specify how many posts to retrieve (max 100).
-.PARAMETER Subreddit
-    One or more subreddit names (without /r/).
+    Uses Reddit's API and OAuth2 to fetch posts made by specified Reddit user(s).
+    You can specify the sort type (Top, New, Hot, Controversial) and limit the number of posts.
+    Timeframe switches (-LastHour, -LastDay, etc.) apply to 'Top' and 'Controversial' sorts, per Reddit API rules.
+.PARAMETER Username
+    One or more Reddit usernames (without u/).
 .PARAMETER Sort
-    Sort type: Top, New, Rising, Hot, or Controversial. Default is Top.
+    Sort type: Top, New, Hot, or Controversial. Default is New.
 .PARAMETER LastHour
     Retrieve posts from the last hour (Top/Controversial only).
 .PARAMETER LastDay
-    Retrieve posts from the last day (default; Top/Controversial only).
+    Retrieve posts from the last day (Top/Controversial only).
 .PARAMETER LastWeek
     Retrieve posts from the last week (Top/Controversial only).
 .PARAMETER LastMonth
@@ -22,26 +20,27 @@
 .PARAMETER LastYear
     Retrieve posts from the last year (Top/Controversial only).
 .PARAMETER AllTime
-    Retrieve posts from all time (Top/Controversial only).
+    Retrieve posts from all time (default; Top/Controversial only).
 .PARAMETER Count
-    Number of posts to retrieve per subreddit (max 100, default 25).
+    Number of posts to retrieve per user (max 100, default 25).
 .PARAMETER DebugApi
     If specified, outputs verbose debugging information about the API requests and responses.
 .NOTES
-    Reddit's API only allows one sort and (if applicable) one timeframe per request. Timeframes only apply to 'Top' and 'Controversial' sorts. Other sorts (New, Rising, Hot) ignore timeframe and always return the latest/rising/hot posts.
+    Reddit's API only allows one sort and (if applicable) one timeframe per request.
+    Timeframes only apply to 'Top' and 'Controversial' sorts.
 .EXAMPLE
-    Get-RedditPosts -Subreddit 'powershell' -Sort New -Count 10
+    Get-RedditUserPost -Username 'LukeEvansTech' -Sort New -Count 10
 .EXAMPLE
-    Get-RedditPosts -Subreddit 'powershell' -Sort Top -LastWeek
+    Get-RedditUserPost -Username 'LukeEvansTech' -Sort Top -LastWeek
 #>
-function Get-RedditPost {
+function Get-RedditUserPost {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [string[]]$Subreddit,
+        [string[]]$Username,
         [Parameter()]
-        [ValidateSet('Top', 'New', 'Rising', 'Hot', 'Controversial')]
-        [string]$Sort = 'Top',
+        [ValidateSet('Top', 'New', 'Hot', 'Controversial')]
+        [string]$Sort = 'New',
         [Parameter()]
         [switch]$LastHour,
         [Parameter()]
@@ -60,6 +59,7 @@ function Get-RedditPost {
         [Parameter()]
         [switch]$DebugApi
     )
+
     # Determine timeframe (only for Top/Controversial)
     $timeframe = $null
     if ($Sort -in @('Top', 'Controversial')) {
@@ -69,42 +69,59 @@ function Get-RedditPost {
         elseif ($LastMonth) { $timeframe = 'month' }
         elseif ($LastYear) { $timeframe = 'year' }
         elseif ($AllTime) { $timeframe = 'all' }
-        else { $timeframe = 'day' } # Default timeframe
+        else { $timeframe = 'all' } # Default timeframe for user posts
     }
+
     # Authenticate
     $token = Get-RedditOAuthToken
     if (-not $token) {
         Write-Error 'Could not retrieve Reddit OAuth token.'
         return
     }
-    $headers = @{ Authorization = "bearer $token"; 'User-Agent' = 'PSReddit/0.1.0 (by u/LukeEvansTech)' }
+
+    $headers = @{
+        Authorization = "bearer $token"
+        'User-Agent'  = 'PSReddit/0.1.0 (by u/LukeEvansTech)'
+    }
+
     $allPosts = @()
-    foreach ($sub in $Subreddit) {
+
+    foreach ($user in $Username) {
         $sortPath = if ($PSBoundParameters.ContainsKey('Sort') -and $Sort) { $Sort.ToLower() } else { 'new' }
         if ([string]::IsNullOrWhiteSpace($sortPath)) { $sortPath = 'new' }
-        $uri = "https://oauth.reddit.com/r/$sub/$($sortPath)?limit=$Count"
+
+        # Reddit API endpoint for user posts is different from subreddit posts
+        $uri = "https://oauth.reddit.com/user/$user/submitted?limit=$Count"
+
         if ($DebugApi) {
             Write-Verbose "[DEBUG] Sort param: $Sort"
             Write-Verbose "[DEBUG] sortPath: $sortPath"
-            Write-Verbose "[DEBUG] sub: $sub"
+            Write-Verbose "[DEBUG] user: $user"
             Write-Verbose "[DEBUG] Count: $Count"
             Write-Verbose "[DEBUG] Raw URI string: $uri"
-            Write-Verbose "[DEBUG] URI as char array: $($uri.ToCharArray() -join ',')"
         }
+
+        # Add sort parameter
+        $uri += "&sort=$sortPath"
+
         # Only add timeframe for 'top' and 'controversial' sorts
         if ($timeframe -and ($sortPath -eq 'top' -or $sortPath -eq 'controversial')) {
             $uri += "&t=$timeframe"
         }
+
         $uri += "&api_type=json"
+
         if ($DebugApi) { Write-Verbose "[DEBUG] Requesting: $uri" }
+
         try {
             $headers['User-Agent'] = 'PSReddit/0.1.0 (by u/LukeEvansTech on GitHub)'
             $response = Invoke-RestMethod -Uri $uri -Headers $headers -ErrorAction Stop
+
             if ($response.data.children) {
                 $posts = $response.data.children | ForEach-Object { [PSCustomObject]$_.data }
                 $allPosts += $posts
             } else {
-                Write-Error "No posts found or invalid subreddit: $sub"
+                Write-Error "No posts found or invalid username: $user"
             }
         } catch {
             if ($DebugApi) {
@@ -129,8 +146,9 @@ function Get-RedditPost {
                     }
                 } catch { Write-Verbose "[DEBUG] Could not extract debug info from response: $_" }
             }
-            Write-Error "Failed to retrieve posts for subreddit '$sub': $($_.Exception.Message)"
+            Write-Error "Failed to retrieve posts for user '$user': $($_.Exception.Message)"
         }
     }
+
     return $allPosts
 }

@@ -45,7 +45,7 @@ $env:REDDIT_CLIENT_SECRET = 'your-client-secret'
 $token = Get-RedditOAuthToken
 
 # Get the top 5 posts from the 'powershell' subreddit from the last day
-$posts = Get-RedditPosts -Subreddit 'powershell' -Sort Top -LastDay -Count 5
+$posts = Get-RedditSubredditPost -Subreddit 'powershell' -Sort Top -LastDay -Count 5
 
 # Display post titles
 $posts.title

@@ -3,6 +3,12 @@ name: "PSReddit - Publish Module"
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   publish:
