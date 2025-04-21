@@ -12,8 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup PowerShell
-        uses: actions/setup-powershell@v2
+      # PowerShell Core is already pre-installed on GitHub-hosted runners
 
       - name: Publish to PSGallery
         shell: pwsh
