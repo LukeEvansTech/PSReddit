@@ -4,9 +4,13 @@
 
 PSReddit is a PowerShell module for interacting with the Reddit API.
 
+## Documentation
+
+You are currently viewing the online documentation at [https://lukeevanstech.github.io/PSReddit/](https://lukeevanstech.github.io/PSReddit/)
+
 ## Description
 
-This module provides cmdlets to authenticate with Reddit, retrieve posts, submit content, and perform other common Reddit actions directly from PowerShell.
+This module provides cmdlets to authenticate with Reddit, retrieve posts from subreddits and users, and interact with the Reddit API directly from PowerShell.
 
 ## Why
 

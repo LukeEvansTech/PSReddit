@@ -12,11 +12,18 @@ This module provides cmdlets to authenticate with the Reddit API using OAuth 2.0
 
 <!-- Short reason you created the project -->
 
+## Documentation
+
+Full documentation is available at: [https://lukeevanstech.github.io/PSReddit/](https://lukeevanstech.github.io/PSReddit/)
+
 ## Features
+
 - OAuth authentication (using environment variables for secrets)
-- Retrieve posts by subreddit, sort type (Top, New, Hot, etc.), and timeframe (for Top/Controversial)
+- Retrieve posts by subreddit with `Get-RedditSubredditPost`
+- Retrieve posts from specific users with `Get-RedditUserPost`
+- Support for various sort types (Top, New, Hot, etc.) and timeframes (for Top/Controversial)
 - Pester tests for integration testing
-- MkDocs documentation structure
+- Comprehensive MkDocs documentation
 
 ## Getting Started
 
