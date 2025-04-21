@@ -1,4 +1,4 @@
-name: PSReddit - Deploy Docs
+name: "PSReddit - Deploy Docs"
 
 on:
   push:
