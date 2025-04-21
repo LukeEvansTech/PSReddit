@@ -21,6 +21,9 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    env:
+      REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+      REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
     strategy:
       fail-fast: false
     steps:
