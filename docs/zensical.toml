@@ -64,13 +64,13 @@ Home = "index.md"
 
 [[nav]]
 "Developer Guide" = [
-  { "Development" = "DEVELOPMENT.md" },
-  { "GitHub Workflows" = "WORKFLOWS.md" },
-  { "Module Manifest" = "PSReddit.md" }
+  { "Development" = "development.md" },
+  { "GitHub Workflows" = "workflows.md" },
+  { "Module Manifest" = "module-manifest.md" }
 ]
 
 [[nav]]
-"Change Log" = "CHANGELOG.md"
+"Change Log" = "changelog.md"
 
 # Markdown Extensions
 [markdown_extensions]
