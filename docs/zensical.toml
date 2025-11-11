@@ -1,0 +1,82 @@
+# Zensical Configuration
+# https://zensical.org/docs/
+
+[project]
+site_name = "PSReddit"
+site_description = "PSReddit is a cross-platform PowerShell 7+ module for interacting with the Reddit API"
+site_author = "Luke Evans"
+site_url = "https://LukeEvansTech.github.io/PSReddit/"
+copyright = "Copyright © 2025 Luke Evans"
+
+docs_dir = "docs"
+site_dir = "site"
+use_directory_urls = true
+dev_addr = "localhost:8000"
+
+extra_css = ["assets/stylesheets/custom.css"]
+
+[project.theme]
+name = "material"
+variant = "modern"
+language = "en"
+
+# Color Schemes - Auto-detected from system preferences
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "blue"
+accent = "light-blue"
+toggle_icon = "material/brightness-7"
+toggle_name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "blue"
+accent = "light-blue"
+toggle_icon = "material/brightness-4"
+toggle_name = "Switch to light mode"
+
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+# Repository Integration
+repo_url = "https://github.com/LukeEvansTech/PSReddit/"
+repo_name = "LukeEvansTech/PSReddit"
+edit_uri = "edit/main/docs/docs"
+
+# Navigation Structure
+[[nav]]
+Home = "index.md"
+
+[[nav]]
+Cmdlets = [
+  { "Get-RedditOAuthToken" = "Get-RedditOAuthToken.md" },
+  { "Get-RedditSubredditPost" = "Get-RedditSubredditPost.md" },
+  { "Get-RedditUserPost" = "Get-RedditUserPost.md" }
+]
+
+[[nav]]
+Reference = [
+  { "Module Manifest" = "PSReddit.md" }
+]
+
+[[nav]]
+Workflows = "WORKFLOWS.md"
+
+[[nav]]
+Development = "DEVELOPMENT.md"
+
+[[nav]]
+"Change Log" = "CHANGELOG.md"
+
+# Markdown Extensions
+[markdown_extensions]
+admonition = {}
+toc = { permalink = true }
+
+[markdown_extensions.pymdownx]
+highlight = { anchor_linenums = true, line_spans = "__span", pygments_lang_class = true }
+inlinehilite = {}
+snippets = {}
+superfences = {}

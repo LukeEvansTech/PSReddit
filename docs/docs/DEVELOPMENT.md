@@ -91,19 +91,35 @@ This runs the `Clean`, `ImportModuleManifest`, and `CreateHelpStart` tasks, incl
 
 ### Preview Documentation Site
 
-This project uses MkDocs with the Material theme. To preview the documentation site locally:
+This project uses Zensical with the Material theme. To preview the documentation site locally:
 
 1.  Ensure you have Python and pip installed.
-2.  Install MkDocs and the Material theme:
+2.  Install Zensical:
     ```bash
-    pip install mkdocs mkdocs-material
+    pip install -r docs/requirements.txt
     ```
-3.  Navigate to the project root directory (where `mkdocs.yml` is located).
-4.  Run the MkDocs development server:
+3.  Navigate to the `docs/` directory:
     ```bash
-    mkdocs serve
+    cd docs
     ```
-5.  Open your browser to `http://127.0.0.1:8000`.
+4.  Run the Zensical development server:
+    ```bash
+    npm start
+    # or directly: zensical serve
+    ```
+5.  Open your browser to `http://localhost:8000`.
+
+### Build Documentation Site
+
+To build the static documentation site:
+
+```bash
+cd docs
+npm run build
+# or directly: zensical build
+```
+
+The built site will be in the `docs/site/` directory.
 
 ## Cleaning
 

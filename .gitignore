@@ -22,3 +22,8 @@ Thumbs.db
 *.nupkg
 node_modules/
 reddit_secrets.json
+
+# Zensical documentation build artifacts
+#########################################
+docs/site/
+.zensical/

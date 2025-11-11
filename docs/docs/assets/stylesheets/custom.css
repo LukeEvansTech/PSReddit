@@ -1,0 +1,14 @@
+/* Custom styles for PSReddit documentation */
+
+/* Hide Zensical branding in footer */
+.md-footer-meta__inner .md-copyright a[href*="zensical"] {
+  display: none !important;
+}
+
+.md-footer-meta__inner .md-copyright > br {
+  display: none !important;
+}
+
+.md-footer-meta__inner .md-copyright > a[href*="zensical"] ~ * {
+  display: none !important;
+}
