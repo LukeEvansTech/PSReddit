@@ -50,22 +50,24 @@ edit_uri = "edit/main/docs/docs"
 Home = "index.md"
 
 [[nav]]
-Cmdlets = [
+"Getting Started" = [
+  { "Installation" = "index.md#installation" },
+  { "Quick Start" = "index.md#quick-start" }
+]
+
+[[nav]]
+"Cmdlet Reference" = [
   { "Get-RedditOAuthToken" = "Get-RedditOAuthToken.md" },
   { "Get-RedditSubredditPost" = "Get-RedditSubredditPost.md" },
   { "Get-RedditUserPost" = "Get-RedditUserPost.md" }
 ]
 
 [[nav]]
-Reference = [
+"Developer Guide" = [
+  { "Development" = "DEVELOPMENT.md" },
+  { "GitHub Workflows" = "WORKFLOWS.md" },
   { "Module Manifest" = "PSReddit.md" }
 ]
-
-[[nav]]
-Workflows = "WORKFLOWS.md"
-
-[[nav]]
-Development = "DEVELOPMENT.md"
 
 [[nav]]
 "Change Log" = "CHANGELOG.md"
