@@ -1,0 +1,59 @@
+name: "PSReddit - Lint"
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  megalinter:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: MegaLinter
+        uses: oxsecurity/megalinter@v8
+        env:
+          # Validate all source code when push on main
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Enable only PowerShell linters
+          ENABLE_LINTERS: POWERSHELL_POWERSHELL,POWERSHELL_POWERSHELL_FORMATTER
+
+          # PowerShell specific settings
+          POWERSHELL_POWERSHELL_FILTER_REGEX_INCLUDE: '(src/)'
+          POWERSHELL_POWERSHELL_CONFIG_FILE: src/PSScriptAnalyzerSettings.psd1
+
+          # Disable automatic fixes (we want to review them)
+          APPLY_FIXES: none
+
+          # Report settings
+          PRINT_ALPACA: false
+          LOG_LEVEL: INFO
+
+      - name: Archive production artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: MegaLinter reports
+          path: |
+            megalinter-reports
+            mega-linter.log
