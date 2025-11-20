@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Display the path
         shell: pwsh
         run: echo ${env:PATH}
