@@ -23,18 +23,18 @@ jobs:
           # Path to the module directory (where the .psd1 file is located)
           $ModulePath = "${{ github.workspace }}/src/PSReddit"
           Write-Host "Publishing from: $ModulePath"
-          
+
           # Verify the module path exists and contains a valid module
           if (-not (Test-Path $ModulePath)) {
             Write-Error "Module path not found: $ModulePath"
             exit 1
           }
-          
+
           if (-not (Test-Path "$ModulePath/PSReddit.psd1")) {
             Write-Error "Module manifest not found at $ModulePath/PSReddit.psd1"
             exit 1
           }
-          
+
           # Publish the module
           try {
             Publish-Module -Path $ModulePath -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }} -Repository PSGallery -Verbose
