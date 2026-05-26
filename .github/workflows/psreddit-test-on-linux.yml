@@ -1,3 +1,4 @@
+---
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/virtual-environments-for-github-hosted-runners
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/software-installed-on-github-hosted-runners
@@ -6,17 +7,22 @@
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-powershell
 # https://github.com/actions/upload-artifact#where-does-the-upload-go
 name: "PSReddit - Test on Linux"
+
 on:
   push:
     branches:
       - main
     paths-ignore:
-      - '**.md'
-      - 'docs/**'
+      - "**.md"
+      - "docs/**"
   pull_request:
     paths-ignore:
-      - '**.md'
-      - 'docs/**'
+      - "**.md"
+      - "docs/**"
+
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Run Tests
@@ -27,33 +33,35 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v6
-    - name: Display the path
-      shell: pwsh
-      run: echo ${env:PATH}
-    - name: Version Display
-      shell: pwsh
-      run: $PSVersionTable
-    # uncomment below to explore what modules/variables/env variables are available in the build image
-    # - name: Modules and Variables Display
-    #   shell: pwsh
-    #   run: Get-Module -ListAvailable; (Get-Variable).GetEnumerator() | Sort-Object Name | Out-String; (Get-ChildItem env:*).GetEnumerator() | Sort-Object Name | Out-String
-    - name: Bootstrap
-      shell: pwsh
-      run: ./actions_bootstrap.ps1
-    - name: Test and Build
-      shell: pwsh
-      run: Invoke-Build -File .\src\PSReddit.build.ps1
-    - name: Upload pester results
-      uses: actions/upload-artifact@v7
-      with:
-        name: pester-results
-        path: ./src/Artifacts/testOutput
-        if-no-files-found: warn
-    - name: Upload zip module archive build
-      uses: actions/upload-artifact@v7
-      with:
-        name: zip-archive
-        path: ./src/Archive
-        if-no-files-found: warn
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Display the path
+        shell: pwsh
+        run: echo ${env:PATH}
+      - name: Version Display
+        shell: pwsh
+        run: $PSVersionTable
+      # uncomment below to explore what modules/variables/env variables are available in the build image
+      # - name: Modules and Variables Display
+      #   shell: pwsh
+      #   run: Get-Module -ListAvailable; (Get-Variable).GetEnumerator() | Sort-Object Name | Out-String; (Get-ChildItem env:*).GetEnumerator() | Sort-Object Name | Out-String
+      - name: Bootstrap
+        shell: pwsh
+        run: ./actions_bootstrap.ps1
+      - name: Test and Build
+        shell: pwsh
+        run: Invoke-Build -File .\src\PSReddit.build.ps1
+      - name: Upload pester results
+        uses: actions/upload-artifact@v7
+        with:
+          name: pester-results
+          path: ./src/Artifacts/testOutput
+          if-no-files-found: warn
+      - name: Upload zip module archive build
+        uses: actions/upload-artifact@v7
+        with:
+          name: zip-archive
+          path: ./src/Archive
+          if-no-files-found: warn
