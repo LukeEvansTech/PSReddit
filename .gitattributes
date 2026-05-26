@@ -1,0 +1,20 @@
+# Auto-detect text files; ensure LF line endings on checkout for cross-platform
+# consistency. Override per-extension below for any files that must be CRLF.
+* text=auto eol=lf
+
+# PowerShell tooling generally accepts LF; keep LF for source.
+*.ps1   text eol=lf
+*.psm1  text eol=lf
+*.psd1  text eol=lf
+
+# Markdown/YAML/JSON
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.json  text eol=lf
+
+# Binary
+*.png   binary
+*.jpg   binary
+*.gif   binary
+*.zip   binary
