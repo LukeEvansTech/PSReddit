@@ -1,3 +1,4 @@
+---
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/virtual-environments-for-github-hosted-runners
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/software-installed-on-github-hosted-runners
@@ -6,6 +7,7 @@
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-powershell
 # https://github.com/actions/upload-artifact#where-does-the-upload-go
 name: "PSReddit - Test on macOS"
+
 on:
   pull_request:
     paths-ignore:
@@ -17,6 +19,10 @@ on:
     paths-ignore:
       - "**.md"
       - "docs/**"
+
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Run Tests
@@ -29,6 +35,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Display the path
         shell: pwsh
         run: echo ${env:PATH}
