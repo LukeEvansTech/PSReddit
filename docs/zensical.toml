@@ -5,7 +5,7 @@
 site_name = "PSReddit"
 site_description = "PSReddit is a cross-platform PowerShell 7+ module for interacting with the Reddit API"
 site_author = "Luke Evans"
-site_url = "https://LukeEvansTech.github.io/PSReddit/"
+site_url = "https://lukeevanstech.github.io/PSReddit/"
 copyright = "Copyright © 2025 Luke Evans"
 
 docs_dir = "docs"
