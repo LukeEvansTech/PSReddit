@@ -1,3 +1,4 @@
+---
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/virtual-environments-for-github-hosted-runners
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/software-installed-on-github-hosted-runners
@@ -6,6 +7,7 @@
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-powershell
 # https://github.com/actions/upload-artifact#where-does-the-upload-go
 name: "PSReddit - Test on macOS"
+
 on:
   pull_request:
     paths-ignore:
@@ -17,6 +19,7 @@ on:
     paths-ignore:
       - "**.md"
       - "docs/**"
+
 permissions:
   contents: read
 
@@ -25,8 +28,10 @@ jobs:
     name: Run Tests
     runs-on: macOS-latest
     env:
-      REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
-      REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+      # Repo-level CI test credentials, intentionally exposed to PR runs; an
+      # environment gate would block automated (Renovate) PR test runs.
+      REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }} # zizmor: ignore[secrets-outside-env]
+      REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }} # zizmor: ignore[secrets-outside-env]
     strategy:
       fail-fast: false
     steps:
