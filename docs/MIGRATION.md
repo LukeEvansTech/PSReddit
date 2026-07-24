@@ -16,18 +16,21 @@ Zensical is a modern documentation site generator built by the creators of Mater
 ## What Changed
 
 ### New Files
+
 - `zensical.toml` - Main Zensical configuration (replaces `mkdocs.yml`)
-- `docs/package.json` - NPM scripts for running Zensical commands
+- `docs/package.json` - npm scripts for running Zensical commands
 - `docs/assets/stylesheets/custom.css` - Custom styling to hide Zensical branding
 
 ### Updated Files
+
 - `docs/requirements.txt` - Now uses `zensical>=0.0.4` instead of MkDocs packages
 - `.github/workflows/psreddit-deploy-docs.yml` - Updated to use Zensical build process
 - `.gitignore` - Added `docs/site/` and `.zensical/` to ignore build artifacts
 - `.readthedocs.yaml` - Updated to use Zensical build commands
 
 ### Preserved Files
-- All markdown documentation files (`.md`) remain unchanged
+
+- All Markdown documentation files (`.md`) remain unchanged
 - Documentation structure and navigation remain the same
 - All content, examples, and code snippets are preserved
 
@@ -36,6 +39,7 @@ Zensical is a modern documentation site generator built by the creators of Mater
 ### MkDocs → Zensical Configuration
 
 **Site Information:**
+
 ```yaml
 # mkdocs.yml
 site_name: PSReddit
@@ -50,6 +54,7 @@ site_url = "https://LukeEvansTech.github.io/PSReddit/"
 ```
 
 **Theme Configuration:**
+
 ```yaml
 # mkdocs.yml
 theme:
@@ -73,6 +78,7 @@ primary = "blue"
 ```
 
 **Navigation:**
+
 ```yaml
 # mkdocs.yml
 nav:
@@ -95,6 +101,7 @@ Cmdlets = [
 ## Development Workflow Changes
 
 ### Before (MkDocs)
+
 ```bash
 # Install dependencies
 pip install -r docs/requirements.txt
@@ -110,6 +117,7 @@ mkdocs gh-deploy
 ```
 
 ### After (Zensical)
+
 ```bash
 # Install dependencies
 pip install -r docs/requirements.txt
@@ -129,18 +137,23 @@ npm run build
 ## Deployment Changes
 
 ### GitHub Actions
+
 The workflow now uses a two-job approach:
+
 1. **Build Job**: Builds the site with Zensical and uploads artifact
 2. **Deploy Job**: Deploys the artifact to GitHub Pages
 
 Benefits:
+
 - Better separation of concerns
 - Pip caching for faster builds
 - Only triggers on changes to `docs/**` or workflow file
 - Manual trigger support via `workflow_dispatch`
 
 ### ReadTheDocs
+
 ReadTheDocs configuration updated to use custom build commands:
+
 ```yaml
 build:
   commands:
@@ -153,6 +166,7 @@ build:
 ## Breaking Changes
 
 None! The migration is designed to be seamless:
+
 - All URLs remain the same
 - All documentation content is preserved
 - Navigation structure unchanged
@@ -168,13 +182,14 @@ If you need to rollback to MkDocs:
 4. Delete `zensical.toml` and `docs/package.json`
 5. Revert `.readthedocs.yaml` changes
 
-The original MkDocs configuration can be found in the git history before this migration commit.
+The original MkDocs configuration can be found in the Git history before this migration commit.
 
 ## Testing the Migration
 
 To verify the migration was successful:
 
 1. **Local Build Test:**
+
    ```bash
    cd docs
    pip install -r requirements.txt
@@ -202,6 +217,7 @@ To verify the migration was successful:
 ## Questions or Issues?
 
 If you encounter any issues with the migration:
+
 1. Check the build logs in GitHub Actions
 2. Verify local build works correctly
 3. Review the Zensical documentation
