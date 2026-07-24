@@ -59,9 +59,11 @@ $posts.title
 ```
 
 ## Docs
+
 See the [documentation](./docs/index.md) for full usage, installation, and development information.
 
 ## Development
+
 - Run tests: `Invoke-Pester ./src/Tests -CI` (Ensure Pester module is installed)
 - Style Guides: Refer to project configuration files (e.g., `.editorconfig`, `PSScriptAnalyzerSettings.psd1`).
 - Contributions welcome! Please follow standard fork & pull request workflow.
