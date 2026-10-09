@@ -239,11 +239,12 @@ Add-BuildTask DiscoveryCheck -Before Test {
             $params = $ast.FindAll({
                     param ($node)
                     $node -is [System.Management.Automation.Language.CommandParameterAst] -and
-                    $node.ParameterName -in @('Skip', 'ForEach', 'TestCases')
+                    $node.ParameterName -in @('Skip', 'ForEach', 'TestCases') -and
+                    $node.Parent.GetCommandName() -in @('Describe', 'Context', 'It')
                 }, $true)
             foreach ($param in $params) {
                 $value = $param.Argument
-                if (-not $value) {
+                if (-not $value -and $param.ParameterName -ne 'Skip') {
                     # -ForEach $x: the value is the next element of the command
                     $elements = $param.Parent.CommandElements
                     $index = $elements.IndexOf($param)
