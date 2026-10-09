@@ -1,0 +1,4 @@
+[codespell]
+skip = */package-lock.json,*/go.mod,*/go.sum,*.log,.git
+# AllTime is a public parameter name (Get-Reddit*Post -AllTime), not a misspelling.
+ignore-words-list = alltime

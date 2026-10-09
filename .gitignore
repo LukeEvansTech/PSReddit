@@ -23,6 +23,11 @@ Thumbs.db
 node_modules/
 reddit_secrets.json
 
+# platyPS help the build regenerates into docs/ (the published pages live in docs/docs/)
+#########################################
+docs/PSReddit.md
+docs/Get-Reddit*.md
+
 # Zensical documentation build artifacts
 #########################################
 docs/site/

@@ -1,12 +1,5 @@
 ---
-# https://help.github.com/en/actions/automating-your-workflow-with-github-actions
-# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/virtual-environments-for-github-hosted-runners
-# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/software-installed-on-github-hosted-runners
-# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#using-a-specific-shell
-# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
-# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-powershell
-# https://github.com/actions/upload-artifact#where-does-the-upload-go
-name: "PSReddit - Test on macOS"
+name: "PSReddit - Test"
 
 on:
   pull_request:
@@ -25,8 +18,8 @@ permissions:
 
 jobs:
   test:
-    name: Run Tests
-    runs-on: macOS-latest
+    name: Run Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     env:
       # Repo-level CI test credentials, intentionally exposed to PR runs; an
       # environment gate would block automated (Renovate) PR test runs.
@@ -34,36 +27,32 @@ jobs:
       REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }} # zizmor: ignore[secrets-outside-env]
     strategy:
       fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Display the path
-        shell: pwsh
-        run: echo ${env:PATH}
       - name: Version Display
         shell: pwsh
         run: $PSVersionTable
-      # uncomment below to explore what modules/variables/env variables are available in the build image
-      # - name: Modules and Variables Display
-      #   shell: pwsh
-      #   run: Get-Module -ListAvailable; (Get-Variable).GetEnumerator() | Sort-Object Name | Out-String; (Get-ChildItem env:*).GetEnumerator() | Sort-Object Name | Out-String
       - name: Bootstrap
         shell: pwsh
         run: ./actions_bootstrap.ps1
       - name: Test and Build
         shell: pwsh
-        run: Invoke-Build -File .\src\PSReddit.build.ps1
+        run: Invoke-Build -File ./src/PSReddit.build.ps1
       - name: Upload pester results
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: pester-results
+          name: pester-results-${{ matrix.os }}
           path: ./src/Artifacts/testOutput
           if-no-files-found: warn
       - name: Upload zip module archive build
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: zip-archive
+          name: zip-archive-${{ matrix.os }}
           path: ./src/Archive
           if-no-files-found: warn

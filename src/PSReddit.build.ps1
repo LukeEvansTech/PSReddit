@@ -12,6 +12,7 @@
         - DevCC
         - CreateHelpStart
         - Build
+        - TestBuiltModule
         - IntegrationTest
         - Archive
 .EXAMPLE
@@ -89,8 +90,11 @@ Enter-Build {
 
     $script:BuildModuleRootFile = Join-Path -Path $script:ArtifactsPath -ChildPath "$($script:ModuleName).psm1"
 
-    # Ensure our builds fail until if below a minimum defined code test coverage threshold
-    $script:coverageThreshold = 30
+    # One PSScriptAnalyzer settings file for the build, super-linter and VS Code.
+    $script:AnalyzerSettings = [System.IO.Path]::Combine($BuildRoot, '..', '.github', 'linters', '.powershell-psscriptanalyzer.psd1')
+
+    # Fail the build below this unit-test coverage. Raise it as coverage rises; never lower it to get green.
+    $script:coverageThreshold = 90
 
     [version]$script:MinPesterVersion = '5.2.2'
     [version]$script:MaxPesterVersion = '5.99.99'
@@ -164,7 +168,7 @@ Add-BuildTask Analyze {
 
     $scriptAnalyzerParams = @{
         Path    = $script:ModuleSourcePath
-        Setting = 'PSScriptAnalyzerSettings.psd1'
+        Setting = $script:AnalyzerSettings
         Recurse = $true
         Verbose = $false
     }
@@ -186,7 +190,7 @@ Add-BuildTask AnalyzeTests -After Analyze {
 
         $scriptAnalyzerParams = @{
             Path        = $script:TestsPath
-            Setting     = 'PSScriptAnalyzerSettings.psd1'
+            Setting     = $script:AnalyzerSettings
             ExcludeRule = 'PSUseDeclaredVarsMoreThanAssignments'
             Recurse     = $true
             Verbose     = $false
@@ -560,6 +564,27 @@ Add-BuildTask Build {
 
     Write-Build Green '      ...Build Complete!'
 } #Build
+
+#Synopsis: Imports the built module from Artifacts in a clean session and checks it exports exactly the manifest's functions
+Add-BuildTask TestBuiltModule -After Build {
+    $builtManifest = Join-Path -Path $script:ArtifactsPath -ChildPath "$($script:ModuleName).psd1"
+    $probe = {
+        param ($Manifest, $Name)
+        Import-Module -Name $Manifest -Force -ErrorAction Stop
+        (Get-Command -Module $Name -CommandType Function).Name
+    }
+    # A script block passed to a child pwsh carries its arguments without string quoting.
+    $pwsh = (Get-Process -Id $PID).Path
+    $exported = @(& $pwsh -NoProfile -NonInteractive -Command $probe -args $builtManifest, $script:ModuleName)
+    Assert-Build ($LASTEXITCODE -eq 0) 'The built module failed to import.'
+
+    $difference = Compare-Object -ReferenceObject @($script:FunctionsToExport) -DifferenceObject $exported
+    if ($difference) {
+        $difference | Format-Table
+        throw ('      The built module exports [{0}], but the manifest lists [{1}].' -f ($exported -join ', '), ($script:FunctionsToExport -join ', '))
+    }
+    Write-Build Green "      ...Built module exports $($exported.Count) functions, matching the manifest."
+} #TestBuiltModule
 
 #Synopsis: Invokes all Pester Integration Tests in the Tests\Integration folder (if it exists)
 Add-BuildTask IntegrationTest {
