@@ -20,12 +20,20 @@ Describe 'PSReddit Integration Tests' -Tag Integration -Skip:$skipTests {
         $token | Should -Match '^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$'
     }
 
-    It 'Should retrieve Top posts (default timeframe)' {
-        $posts = Get-RedditSubredditPost -Subreddit 'powershell' -Sort 'Top' -LastDay -Count 3
+    # Last-day listings use r/AskReddit: a smaller subreddit can genuinely go a day without a
+    # post (r/powershell's newest post was 25 h old on 2026-10-09, so its Top/day was empty).
+    It 'Should retrieve Top posts for the last day' {
+        $posts = Get-RedditSubredditPost -Subreddit 'AskReddit' -Sort 'Top' -LastDay -Count 3
         $posts | Should -Not -BeNullOrEmpty
         $posts[0].title | Should -Not -BeNullOrEmpty
         $posts[0].author | Should -Not -BeNullOrEmpty
-        $posts[0].subreddit | Should -Be 'powershell'
+        $posts[0].subreddit | Should -Be 'AskReddit'
+    }
+
+    It 'Should default to Top over the last day when no sort is given' {
+        $posts = Get-RedditSubredditPost -Subreddit 'AskReddit' -Count 3
+        $posts | Should -Not -BeNullOrEmpty
+        $posts[0].subreddit | Should -Be 'AskReddit'
     }
 
     It 'Should retrieve Top posts for all time' {
@@ -67,8 +75,8 @@ Describe 'PSReddit Integration Tests' -Tag Integration -Skip:$skipTests {
     }
 
     It 'Should respect the Count parameter' {
-        $posts = Get-RedditSubredditPost -Subreddit 'powershell' -Sort Top -LastDay -Count 5
-        $posts.Count | Should -BeLessOrEqual 5
+        $posts = Get-RedditSubredditPost -Subreddit 'AskReddit' -Sort Top -LastDay -Count 5
+        $posts.Count | Should -Be 5
     }
 
     # Tests for Get-RedditUserPost. They use long-standing accounts with public submissions;
@@ -79,13 +87,12 @@ Describe 'PSReddit Integration Tests' -Tag Integration -Skip:$skipTests {
         $posts[0].author | Should -Be 'spez'
     }
 
-    # Known issue: on 2026-10-09 /user/<name>/submitted?sort=top&t=all returned an empty listing
-    # from CI on all three OSes (even for u/spez, whose New listing works) with the app-only
-    # token. Skipped until Get-RedditUserPost -Sort Top is fixed; do not delete.
-    It 'Should retrieve user Top posts' -Skip {
-        $posts = Get-RedditUserPost -Username 'spez' -Sort Top -AllTime -Count 2
+    # Not u/spez here: Reddit returns an empty all-time Top listing for that one account (his
+    # Top for the year, and other users' all-time Top, both work; checked 2026-10-09).
+    It 'Should retrieve user Top posts' {
+        $posts = Get-RedditUserPost -Username 'kn0thing' -Sort Top -AllTime -Count 2
         $posts | Should -Not -BeNullOrEmpty
-        $posts[0].author | Should -Be 'spez'
+        $posts[0].author | Should -Be 'kn0thing'
     }
 
     It 'Should handle multiple usernames' {
