@@ -4,9 +4,8 @@ PSReddit uses GitHub Actions to automate testing, documentation deployment, and 
 
 ## Testing
 
-- **PSReddit - Test on Linux** (`.github/workflows/psreddit-test-on-linux.yml`): runs on pull requests to validate module on Ubuntu.
-- **PSReddit - Test on macOS** (`.github/workflows/psreddit-test-on-macos.yml`): runs on pull requests to validate module on macOS.
-- **PSReddit - Test on Windows** (`.github/workflows/psreddit-test-on-windows.yml`): runs on pull requests to validate module on Windows.
+- **PSReddit - Test** (`.github/workflows/psreddit-test.yml`): runs the full `Invoke-Build` (formatting, PSScriptAnalyzer, unit tests with a 90% coverage floor, help, build, built-module export check, integration tests) on Ubuntu, Windows and macOS for every pull request and push to `main` that touches code.
+- **Lint** (`.github/workflows/lint.yml`): runs super-linter, including PSScriptAnalyzer with `.github/linters/.powershell-psscriptanalyzer.psd1`.
 
 ## Documentation Deployment
 

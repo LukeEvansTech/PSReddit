@@ -60,95 +60,21 @@ function Get-RedditUserPost {
         [switch]$DebugApi
     )
 
-    # Determine timeframe (only for Top/Controversial)
-    $timeframe = $null
-    if ($Sort -in @('Top', 'Controversial')) {
-        if ($LastHour) { $timeframe = 'hour' }
-        elseif ($LastDay) { $timeframe = 'day' }
-        elseif ($LastWeek) { $timeframe = 'week' }
-        elseif ($LastMonth) { $timeframe = 'month' }
-        elseif ($LastYear) { $timeframe = 'year' }
-        elseif ($AllTime) { $timeframe = 'all' }
-        else { $timeframe = 'all' } # Default timeframe for user posts
-    }
+    $timeframe = Get-RedditTimeframe -Sort $Sort -BoundParameters $PSBoundParameters -Default 'all'
 
-    # Authenticate
     $token = Get-RedditOAuthToken
     if (-not $token) {
         Write-Error 'Could not retrieve Reddit OAuth token.'
         return
     }
 
-    $headers = @{
-        Authorization = "bearer $token"
-        'User-Agent'  = 'PSReddit/0.1.0 (by u/LukeEvansTech)'
-    }
-
-    $allPosts = @()
-
+    $sortPath = $Sort.ToLowerInvariant()
     foreach ($user in $Username) {
-        $sortPath = if ($PSBoundParameters.ContainsKey('Sort') -and $Sort) { $Sort.ToLower() } else { 'new' }
-        if ([string]::IsNullOrWhiteSpace($sortPath)) { $sortPath = 'new' }
+        $query = [ordered]@{ limit = $Count; sort = $sortPath }
+        if ($timeframe) { $query['t'] = $timeframe }
+        $query['api_type'] = 'json'
 
-        # Reddit API endpoint for user posts is different from subreddit posts
-        $uri = "https://oauth.reddit.com/user/$user/submitted?limit=$Count"
-
-        if ($DebugApi) {
-            Write-Verbose "[DEBUG] Sort param: $Sort"
-            Write-Verbose "[DEBUG] sortPath: $sortPath"
-            Write-Verbose "[DEBUG] user: $user"
-            Write-Verbose "[DEBUG] Count: $Count"
-            Write-Verbose "[DEBUG] Raw URI string: $uri"
-        }
-
-        # Add sort parameter
-        $uri += "&sort=$sortPath"
-
-        # Only add timeframe for 'top' and 'controversial' sorts
-        if ($timeframe -and ($sortPath -eq 'top' -or $sortPath -eq 'controversial')) {
-            $uri += "&t=$timeframe"
-        }
-
-        $uri += "&api_type=json"
-
-        if ($DebugApi) { Write-Verbose "[DEBUG] Requesting: $uri" }
-
-        try {
-            $headers['User-Agent'] = 'PSReddit/0.1.0 (by u/LukeEvansTech on GitHub)'
-            $response = Invoke-RestMethod -Uri $uri -Headers $headers -ErrorAction Stop
-
-            if ($response.data.children) {
-                $posts = $response.data.children | ForEach-Object { [PSCustomObject]$_.data }
-                $allPosts += $posts
-            } else {
-                Write-Error "No posts found or invalid username: $user"
-            }
-        } catch {
-            if ($DebugApi) {
-                $webResponse = $_.Exception.Response
-                try {
-                    if ($webResponse -is [System.Net.Http.HttpResponseMessage]) {
-                        Write-Verbose "[DEBUG] Status: $($webResponse.StatusCode)"
-                        Write-Verbose "[DEBUG] Headers: $($webResponse.Headers | ConvertTo-Json -Compress)"
-                        # Try to read the body, but skip if disposed
-                        try {
-                            $body = $webResponse.Content.ReadAsStringAsync().Result
-                            Write-Verbose "[DEBUG] Body: $body"
-                        } catch { Write-Verbose "[DEBUG] Body: <disposed or unavailable>" }
-                    } elseif ($webResponse) {
-                        $reader = New-Object System.IO.StreamReader($webResponse.GetResponseStream())
-                        $body = $reader.ReadToEnd()
-                        Write-Verbose "[DEBUG] Status: $($webResponse.StatusCode)"
-                        Write-Verbose "[DEBUG] Headers: $($webResponse.Headers | ConvertTo-Json -Compress)"
-                        Write-Verbose "[DEBUG] Body: $body"
-                    } else {
-                        Write-Verbose "[DEBUG] No web response object available. Exception: $_"
-                    }
-                } catch { Write-Verbose "[DEBUG] Could not extract debug info from response: $_" }
-            }
-            Write-Error "Failed to retrieve posts for user '$user': $($_.Exception.Message)"
-        }
+        Invoke-RedditListing -Path "user/$user/submitted" -Query $query -Token $token `
+            -Kind 'user' -Name $user -DebugApi:$DebugApi
     }
-
-    return $allPosts
 }

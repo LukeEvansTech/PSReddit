@@ -64,8 +64,8 @@ See the [documentation](./docs/index.md) for full usage, installation, and devel
 
 ## Development
 
-- Run tests: `Invoke-Pester ./src/Tests -CI` (Ensure Pester module is installed)
-- Style Guides: Refer to project configuration files (e.g., `.editorconfig`, `PSScriptAnalyzerSettings.psd1`).
+- Run lint and tests: `Invoke-Build -File ./src/PSReddit.build.ps1 TestLocal` (see the development guide in `docs/docs/development.md`)
+- Style guide: PSScriptAnalyzer settings are in `.github/linters/.powershell-psscriptanalyzer.psd1`; formatting follows OTBS.
 - Contributions welcome! Please follow standard fork & pull request workflow.
 
 ## Author

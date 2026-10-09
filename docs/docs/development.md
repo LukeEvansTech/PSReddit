@@ -11,9 +11,9 @@ Before you begin, ensure you have the following installed:
     ```powershell
     Install-Module Invoke-Build -Force
     ```
-*   **Pester Module**: Used for running tests. The build script requires a version between 5.2.2 and 5.99.99. Install a compatible version (e.g., 5.5.0):
+*   **Pester Module**: Used for running tests. The build script requires a version between 5.2.2 and 5.99.99. Install the version CI uses (see `actions_bootstrap.ps1`):
     ```powershell
-    Install-Module Pester -RequiredVersion 5.5.0 -Force
+    Install-Module Pester -RequiredVersion 5.7.1 -Force
     ```
 *   **(Optional) Reddit API Credentials**: For running integration tests, you need a Reddit application Client ID and Secret. Set these as environment variables:
     ```powershell
@@ -51,7 +51,11 @@ Invoke-Build BuildNoIntegration
 
 ### Run Unit Tests
 
-Runs static analysis (PSScriptAnalyzer) and Pester unit tests located in `src/Tests/Unit/`. Also generates code coverage reports.
+Runs static analysis (PSScriptAnalyzer) and Pester unit tests located in `src/Tests/Unit/`. Also generates code coverage reports; the build fails below 90% coverage (`$script:coverageThreshold` in `src/PSReddit.build.ps1`).
+
+Unit tests mock `Invoke-RestMethod`, so they never call Reddit. Tests for a public function live in `src/Tests/Unit/Public/<Function>.Tests.ps1`, and tests for a private helper in `src/Tests/Unit/Private/`, using `InModuleScope`.
+
+PSScriptAnalyzer settings live in one file, `.github/linters/.powershell-psscriptanalyzer.psd1`, shared by the build, super-linter and VS Code.
 
 ```powershell
 Invoke-Build TestLocal
@@ -64,7 +68,7 @@ Test results (NUnit XML) and code coverage reports (JaCoCo XML) are saved in `sr
 
 ### Run Integration Tests
 
-Runs Pester integration tests located in `src/Tests/Integration/`. These tests interact with the live Reddit API and require the `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` environment variables to be set.
+Runs Pester integration tests located in `src/Tests/Integration/`. These tests interact with the live Reddit API and require the `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` environment variables to be set. Without them, Pester reports every integration test as skipped.
 
 ```powershell
 Invoke-Build IntegrationTest
