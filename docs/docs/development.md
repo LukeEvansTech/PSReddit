@@ -60,6 +60,8 @@ Runs static analysis (PSScriptAnalyzer) and Pester unit tests located in `src/Te
 
 Unit tests mock `Invoke-RestMethod`, so they never call Reddit. Tests for a public function live in `src/Tests/Unit/Public/<Function>.Tests.ps1`, and tests for a private helper in `src/Tests/Unit/Private/`, using `InModuleScope`.
 
+Before the tests run, a `DiscoveryCheck` task fails the build if `-Skip`, `-ForEach` or `-TestCases` reads a `$script:` variable. Pester expands those parameters at discovery, before `BeforeAll` runs, so such a test silently skips or runs zero cases. Set the value in `BeforeDiscovery` instead.
+
 PSScriptAnalyzer settings live in one file, `.github/linters/.powershell-psscriptanalyzer.psd1`, shared by the build, super-linter and Visual Studio Code.
 
 ```powershell
