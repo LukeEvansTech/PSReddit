@@ -60,8 +60,10 @@ Describe 'PSReddit Integration Tests' -Tag Integration -Skip:$skipTests {
     }
 
     It 'Should handle an invalid subreddit gracefully' {
-        $posts = Get-RedditSubredditPost -Subreddit 'thissubdoesnotexist12345' -Sort Top -LastDay -Count 1
+        # Invoke-Build runs with ErrorActionPreference = Stop, so silence the expected error and assert on it.
+        $posts = Get-RedditSubredditPost -Subreddit 'thissubdoesnotexist12345' -Sort Top -LastDay -Count 1 -ErrorAction SilentlyContinue -ErrorVariable err
         $posts | Should -BeNullOrEmpty
+        $err.Exception.Message | Should -Contain "Failed to retrieve posts for subreddit 'thissubdoesnotexist12345': Response status code does not indicate success: 404 (Not Found)."
     }
 
     It 'Should respect the Count parameter' {
@@ -69,21 +71,22 @@ Describe 'PSReddit Integration Tests' -Tag Integration -Skip:$skipTests {
         $posts.Count | Should -BeLessOrEqual 5
     }
 
-    # Tests for Get-RedditUserPost
+    # Tests for Get-RedditUserPost. They use long-standing accounts with public submissions;
+    # u/LukeEvansTech returned an empty listing from CI on 2026-10-09.
     It 'Should retrieve user posts (New sort)' {
-        $posts = Get-RedditUserPost -Username 'LukeEvansTech' -Sort New -Count 3
+        $posts = Get-RedditUserPost -Username 'spez' -Sort New -Count 3
         $posts | Should -Not -BeNullOrEmpty
-        $posts[0].author | Should -Be 'LukeEvansTech'
+        $posts[0].author | Should -Be 'spez'
     }
 
     It 'Should retrieve user Top posts' {
-        $posts = Get-RedditUserPost -Username 'LukeEvansTech' -Sort Top -AllTime -Count 2
+        $posts = Get-RedditUserPost -Username 'spez' -Sort Top -AllTime -Count 2
         $posts | Should -Not -BeNullOrEmpty
-        $posts[0].author | Should -Be 'LukeEvansTech'
+        $posts[0].author | Should -Be 'spez'
     }
 
     It 'Should handle multiple usernames' {
-        $posts = Get-RedditUserPost -Username 'LukeEvansTech', 'reddit' -Sort Top -LastMonth -Count 1
+        $posts = Get-RedditUserPost -Username 'spez', 'kn0thing' -Sort Top -AllTime -Count 1
         $posts | Should -Not -BeNullOrEmpty
         $posts.Count | Should -BeGreaterThan 1
     }
