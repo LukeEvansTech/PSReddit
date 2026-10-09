@@ -231,6 +231,42 @@ Add-BuildTask FormattingCheck {
     }
 } #FormattingCheck
 
+#Synopsis: Fails when -Skip, -ForEach or -TestCases read a $script: variable (Pester expands them at discovery, before BeforeAll runs)
+Add-BuildTask DiscoveryCheck -Before Test {
+    $findings = @(foreach ($file in Get-ChildItem -Path $script:TestsPath -Filter '*.Tests.ps1' -Recurse) {
+            $tokens = $null; $parseErrors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$parseErrors)
+            $params = $ast.FindAll({
+                    param ($node)
+                    $node -is [System.Management.Automation.Language.CommandParameterAst] -and
+                    $node.ParameterName -in @('Skip', 'ForEach', 'TestCases') -and
+                    $node.Parent.GetCommandName() -in @('Describe', 'Context', 'It')
+                }, $true)
+            foreach ($param in $params) {
+                $value = $param.Argument
+                if (-not $value -and $param.ParameterName -ne 'Skip') {
+                    # -ForEach $x: the value is the next element of the command
+                    $elements = $param.Parent.CommandElements
+                    $index = $elements.IndexOf($param)
+                    if ($index -ge 0 -and $index + 1 -lt $elements.Count) { $value = $elements[$index + 1] }
+                }
+                if (-not $value) { continue }
+                $scriptVars = $value.FindAll({
+                        param ($node)
+                        $node -is [System.Management.Automation.Language.VariableExpressionAst] -and $node.VariablePath.IsScript
+                    }, $true)
+                if ($scriptVars) {
+                    '{0}:{1} -{2} reads {3} (set it in BeforeDiscovery instead)' -f $file.Name, $param.Extent.StartLineNumber, $param.ParameterName, $scriptVars[0].Extent.Text
+                }
+            }
+        })
+    if ($findings) {
+        $findings | ForEach-Object { Write-Build Red "      $_" }
+        throw '      Pester discovery check failed: a test would silently skip or run zero cases.'
+    }
+    Write-Build Green '      ...Pester discovery check clean.'
+} #DiscoveryCheck
+
 #Synopsis: Invokes all Pester Unit Tests in the Tests\Unit folder (if it exists)
 Add-BuildTask Test {
 
