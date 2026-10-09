@@ -21,10 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Unit tests for every public and private function (coverage floor raised from 30% to 90%), and a build check that the built module exports what the manifest lists.
 - Integration tests now report as skipped, not passed, when Reddit credentials are missing.
-
-### Known issues
-
-- `Get-RedditUserPost -Sort Top` returns no posts against the live API (the integration test is skipped until this is fixed). The New sort works.
+- Live integration tests no longer depend on a small subreddit having posts in the last day, and the user Top test runs again (it was skipped on a false "known issue": the account it used returns an empty all-time Top listing).
 
 ## [0.0.1]
 
