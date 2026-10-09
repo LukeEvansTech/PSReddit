@@ -568,8 +568,14 @@ Add-BuildTask Build {
 #Synopsis: Imports the built module from Artifacts in a clean session and checks it exports exactly the manifest's functions
 Add-BuildTask TestBuiltModule -After Build {
     $builtManifest = Join-Path -Path $script:ArtifactsPath -ChildPath "$($script:ModuleName).psd1"
-    $probe = "Import-Module '$builtManifest' -Force -ErrorAction Stop; (Get-Command -Module '$($script:ModuleName)' -CommandType Function).Name"
-    $exported = @(& ([Environment]::ProcessPath) -NoProfile -NonInteractive -Command $probe)
+    $probe = {
+        param ($Manifest, $Name)
+        Import-Module -Name $Manifest -Force -ErrorAction Stop
+        (Get-Command -Module $Name -CommandType Function).Name
+    }
+    # A script block passed to a child pwsh carries its arguments without string quoting.
+    $pwsh = (Get-Process -Id $PID).Path
+    $exported = @(& $pwsh -NoProfile -NonInteractive -Command $probe -args $builtManifest, $script:ModuleName)
     Assert-Build ($LASTEXITCODE -eq 0) 'The built module failed to import.'
 
     $difference = Compare-Object -ReferenceObject @($script:FunctionsToExport) -DifferenceObject $exported
