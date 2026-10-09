@@ -9,7 +9,7 @@ PSReddit uses GitHub Actions to automate testing, documentation deployment, and 
 
 ## Documentation Deployment
 
-- **PSReddit - Deploy Docs** (`.github/workflows/psreddit-deploy-docs.yml`): runs on push to `main` to build and publish the MkDocs site.
+- **Docs** (`.github/workflows/docs.yml`): builds the Zensical site on pull requests that touch `docs/`, and publishes it to GitHub Pages on push to `main`.
 
 ## Module Publishing
 

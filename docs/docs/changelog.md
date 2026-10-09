@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `Get-RedditSubredditPost` without `-Sort` now uses the documented default (Top, last day); it used to request New.
-- The built module in `src/Artifacts` (and the CI zip) exported only `Get-RedditSubredditPost`, because of a stray `Export-ModuleMember` in that function's file.
+- The built module in `src/Artifacts` (and the CI ZIP archive) exported only `Get-RedditSubredditPost`, because of a stray `Export-ModuleMember` in that function's file.
 
 ### Changed
 
