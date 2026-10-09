@@ -6,20 +6,25 @@ This guide provides instructions for building, testing, and developing the PSRed
 
 Before you begin, ensure you have the following installed:
 
-*   **PowerShell 7+**: The module and build scripts require PowerShell 7 or later.
-*   **Invoke-Build Module**: Used for automating build tasks. Install it using:
-    ```powershell
-    Install-Module Invoke-Build -Force
-    ```
-*   **Pester Module**: Used for running tests. The build script requires a version between 5.2.2 and 5.99.99. Install a compatible version (e.g., 5.5.0):
-    ```powershell
-    Install-Module Pester -RequiredVersion 5.5.0 -Force
-    ```
-*   **(Optional) Reddit API Credentials**: For running integration tests, you need a Reddit application Client ID and Secret. Set these as environment variables:
-    ```powershell
-    $env:REDDIT_CLIENT_ID = 'your-client-id'
-    $env:REDDIT_CLIENT_SECRET = 'your-client-secret'
-    ```
+- **PowerShell 7+**: The module and build scripts require PowerShell 7 or later.
+- **Invoke-Build Module**: Used for automating build tasks. Install it using:
+
+  ```powershell
+  Install-Module Invoke-Build -Force
+  ```
+
+- **Pester Module**: Used for running tests. The build script requires a version between 5.2.2 and 5.99.99. Install the version CI uses (see `actions_bootstrap.ps1`):
+
+  ```powershell
+  Install-Module Pester -RequiredVersion 5.7.1 -Force
+  ```
+
+- **(Optional) Reddit API Credentials**: For running integration tests, you need a Reddit application Client ID and Secret. Set these as environment variables:
+
+  ```powershell
+  $env:REDDIT_CLIENT_ID = 'your-client-id'
+  $env:REDDIT_CLIENT_SECRET = 'your-client-secret'
+  ```
 
 ## Build Process
 
@@ -41,7 +46,7 @@ The final module output will be placed in the `src/Artifacts/PSReddit/` director
 
 ### Build Without Integration Tests
 
-Runs the full build process *except* for the integration tests.
+Runs the full build process _except_ for the integration tests.
 
 ```powershell
 Invoke-Build BuildNoIntegration
@@ -51,28 +56,35 @@ Invoke-Build BuildNoIntegration
 
 ### Run Unit Tests
 
-Runs static analysis (PSScriptAnalyzer) and Pester unit tests located in `src/Tests/Unit/`. Also generates code coverage reports.
+Runs static analysis (PSScriptAnalyzer) and Pester unit tests located in `src/Tests/Unit/`. Also generates code coverage reports; the build fails below 90% coverage (`$script:coverageThreshold` in `src/PSReddit.build.ps1`).
+
+Unit tests mock `Invoke-RestMethod`, so they never call Reddit. Tests for a public function live in `src/Tests/Unit/Public/<Function>.Tests.ps1`, and tests for a private helper in `src/Tests/Unit/Private/`, using `InModuleScope`.
+
+PSScriptAnalyzer settings live in one file, `.github/linters/.powershell-psscriptanalyzer.psd1`, shared by the build, super-linter and Visual Studio Code.
 
 ```powershell
 Invoke-Build TestLocal
 ```
-*Or, to run only the Pester unit tests without analysis:*
+
+_Or, to run only the Pester unit tests without analysis:_
+
 ```powershell
 Invoke-Build Test
 ```
+
 Test results (NUnit XML) and code coverage reports (JaCoCo XML) are saved in `src/Artifacts/`.
 
 ### Run Integration Tests
 
-Runs Pester integration tests located in `src/Tests/Integration/`. These tests interact with the live Reddit API and require the `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` environment variables to be set.
+Runs Pester integration tests located in `src/Tests/Integration/`. These tests interact with the live Reddit API and require the `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` environment variables to be set. Without them, Pester reports every integration test as skipped.
 
 ```powershell
 Invoke-Build IntegrationTest
 ```
 
-### Code Coverage (for VSCode)
+### Code Coverage (for Visual Studio Code)
 
-To generate a `cov.xml` file at the project root compatible with the "Coverage Gutters" VSCode extension:
+To generate a `cov.xml` file at the project root compatible with the "Coverage Gutters" Visual Studio Code extension:
 
 ```powershell
 Invoke-Build DevCC
@@ -82,32 +94,39 @@ Invoke-Build DevCC
 
 ### Generate Help Files
 
-To regenerate the markdown documentation and external help XML file (used by `Get-Help`):
+To regenerate the Markdown documentation and external help XML file (used by `Get-Help`):
 
 ```powershell
 Invoke-Build HelpLocal
 ```
-This runs the `Clean`, `ImportModuleManifest`, and `CreateHelpStart` tasks, including markdown and external help generation. The generated markdown files are placed in `src/Artifacts/docs/` and the XML help file in `src/Artifacts/en-US/`.
+
+This runs the `Clean`, `ImportModuleManifest`, and `CreateHelpStart` tasks, including Markdown and external help generation. The generated Markdown files are placed in `src/Artifacts/docs/` and the XML help file in `src/Artifacts/en-US/`.
 
 ### Preview Documentation Site
 
 This project uses Zensical with the Material theme. To preview the documentation site locally:
 
-1.  Ensure you have Python and pip installed.
-2.  Install Zensical:
-    ```bash
-    pip install -r docs/requirements.txt
-    ```
-3.  Navigate to the `docs/` directory:
-    ```bash
-    cd docs
-    ```
-4.  Run the Zensical development server:
-    ```bash
-    npm start
-    # or directly: zensical serve
-    ```
-5.  Open your browser to `http://localhost:8000`.
+1. Ensure you have Python and pip installed.
+2. Install Zensical:
+
+   ```bash
+   pip install -r docs/requirements.txt
+   ```
+
+3. Navigate to the `docs/` directory:
+
+   ```bash
+   cd docs
+   ```
+
+4. Run the Zensical development server:
+
+   ```bash
+   npm start
+   # or directly: zensical serve
+   ```
+
+5. Open your browser to `http://localhost:8000`.
 
 ### Build Documentation Site
 
@@ -127,3 +146,4 @@ To remove the `src/Artifacts` and `src/Archive` directories:
 
 ```powershell
 Invoke-Build Clean
+```

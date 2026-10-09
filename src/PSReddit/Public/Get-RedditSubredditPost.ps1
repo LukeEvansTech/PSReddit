@@ -60,83 +60,22 @@ function Get-RedditSubredditPost {
         [Parameter()]
         [switch]$DebugApi
     )
-    # Determine timeframe (only for Top/Controversial)
-    $timeframe = $null
-    if ($Sort -in @('Top', 'Controversial')) {
-        if ($LastHour) { $timeframe = 'hour' }
-        elseif ($LastDay) { $timeframe = 'day' }
-        elseif ($LastWeek) { $timeframe = 'week' }
-        elseif ($LastMonth) { $timeframe = 'month' }
-        elseif ($LastYear) { $timeframe = 'year' }
-        elseif ($AllTime) { $timeframe = 'all' }
-        else { $timeframe = 'day' } # Default timeframe
-    }
-    # Authenticate
+
+    $timeframe = Get-RedditTimeframe -Sort $Sort -BoundParameters $PSBoundParameters -Default 'day'
+
     $token = Get-RedditOAuthToken
     if (-not $token) {
         Write-Error 'Could not retrieve Reddit OAuth token.'
         return
     }
-    $headers = @{
-        Authorization = "bearer $token"
-        'User-Agent'  = 'PSReddit/0.1.0 (by u/LukeEvansTech)'
-    }
-    $allPosts = @()
-    foreach ($sub in $Subreddit) {
-        $sortPath = if ($PSBoundParameters.ContainsKey('Sort') -and $Sort) { $Sort.ToLower() } else { 'new' }
-        if ([string]::IsNullOrWhiteSpace($sortPath)) { $sortPath = 'new' }
-        $uri = "https://oauth.reddit.com/r/$sub/$($sortPath)?limit=$Count"
-        if ($DebugApi) {
-            Write-Verbose "[DEBUG] Sort param: $Sort"
-            Write-Verbose "[DEBUG] sortPath: $sortPath"
-            Write-Verbose "[DEBUG] sub: $sub"
-            Write-Verbose "[DEBUG] Count: $Count"
-            Write-Verbose "[DEBUG] Raw URI string: $uri"
-            Write-Verbose "[DEBUG] URI as char array: $($uri.ToCharArray() -join ',')"
-        }
-        # Only add timeframe for 'top' and 'controversial' sorts
-        if ($timeframe -and ($sortPath -eq 'top' -or $sortPath -eq 'controversial')) {
-            $uri += "&t=$timeframe"
-        }
-        $uri += "&api_type=json"
-        if ($DebugApi) { Write-Verbose "[DEBUG] Requesting: $uri" }
-        try {
-            $headers['User-Agent'] = 'PSReddit/0.1.0 (by u/LukeEvansTech on GitHub)'
-            $response = Invoke-RestMethod -Uri $uri -Headers $headers -ErrorAction Stop
-            if ($response.data.children) {
-                $posts = $response.data.children | ForEach-Object { [PSCustomObject]$_.data }
-                $allPosts += $posts
-            } else {
-                Write-Error "No posts found or invalid subreddit: $sub"
-            }
-        } catch {
-            if ($DebugApi) {
-                $webResponse = $_.Exception.Response
-                try {
-                    if ($webResponse -is [System.Net.Http.HttpResponseMessage]) {
-                        Write-Verbose "[DEBUG] Status: $($webResponse.StatusCode)"
-                        Write-Verbose "[DEBUG] Headers: $($webResponse.Headers | ConvertTo-Json -Compress)"
-                        # Try to read the body, but skip if disposed
-                        try {
-                            $body = $webResponse.Content.ReadAsStringAsync().Result
-                            Write-Verbose "[DEBUG] Body: $body"
-                        } catch { Write-Verbose "[DEBUG] Body: <disposed or unavailable>" }
-                    } elseif ($webResponse) {
-                        $reader = New-Object System.IO.StreamReader($webResponse.GetResponseStream())
-                        $body = $reader.ReadToEnd()
-                        Write-Verbose "[DEBUG] Status: $($webResponse.StatusCode)"
-                        Write-Verbose "[DEBUG] Headers: $($webResponse.Headers | ConvertTo-Json -Compress)"
-                        Write-Verbose "[DEBUG] Body: $body"
-                    } else {
-                        Write-Verbose "[DEBUG] No web response object available. Exception: $_"
-                    }
-                } catch { Write-Verbose "[DEBUG] Could not extract debug info from response: $_" }
-            }
-            Write-Error "Failed to retrieve posts for subreddit '$sub': $($_.Exception.Message)"
-        }
-    }
-    return $allPosts
-}
 
-# Export the function
-Export-ModuleMember -Function Get-RedditSubredditPost
+    $sortPath = $Sort.ToLowerInvariant()
+    foreach ($sub in $Subreddit) {
+        $query = [ordered]@{ limit = $Count }
+        if ($timeframe) { $query['t'] = $timeframe }
+        $query['api_type'] = 'json'
+
+        Invoke-RedditListing -Path "r/$sub/$sortPath" -Query $query -Token $token `
+            -Kind 'subreddit' -Name $sub -DebugApi:$DebugApi
+    }
+}

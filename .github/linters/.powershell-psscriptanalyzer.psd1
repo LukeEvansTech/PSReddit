@@ -1,7 +1,6 @@
 @{
-    # Mirrors src/PSScriptAnalyzerSettings.psd1 so super-linter applies the same
-    # rules the repo already uses locally (super-linter reads its PSScriptAnalyzer
-    # settings from .github/linters/, not from src/).
+    # The one PSScriptAnalyzer settings file: super-linter reads it from here, and
+    # src/PSReddit.build.ps1 (Analyze task) and .vscode/settings.json point at it.
     IncludeDefaultRules = $true
     Severity            = @('Error', 'Warning')
     # PSUseDeclaredVarsMoreThanAssignments excluded due to false positives with
