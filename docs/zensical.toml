@@ -50,41 +50,28 @@ repo_name = "LukeEvansTech/PSReddit"
 edit_uri = "edit/main/docs/docs"
 
 # Navigation Structure
-[[nav]]
+[[project.nav]]
 Home = "index.md"
 
-[[nav]]
+[[project.nav]]
 "Getting Started" = [
   { "Installation" = "index.md#installation" },
   { "Quick Start" = "index.md#quick-start" }
 ]
 
-[[nav]]
+[[project.nav]]
 "Cmdlet Reference" = [
   { "Get-RedditOAuthToken" = "Get-RedditOAuthToken.md" },
   { "Get-RedditSubredditPost" = "Get-RedditSubredditPost.md" },
   { "Get-RedditUserPost" = "Get-RedditUserPost.md" }
 ]
 
-[[nav]]
+[[project.nav]]
 "Developer Guide" = [
   { "Development" = "development.md" },
   { "GitHub Workflows" = "workflows.md" },
   { "Module Manifest" = "module-manifest.md" }
 ]
 
-[[nav]]
+[[project.nav]]
 "Change Log" = "changelog.md"
-
-# Markdown Extensions
-[markdown_extensions]
-admonition = {}
-toc = { permalink = true }
-
-[markdown_extensions.pymdownx]
-highlight = { anchor_linenums = true, line_spans = "__span", pygments_lang_class = true }
-inlinehilite = {}
-snippets = {}
-
-[markdown_extensions.pymdownx.superfences]
-custom_fences = [{ name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" }]
