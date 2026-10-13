@@ -20,6 +20,7 @@ jobs:
   test:
     name: Run Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     env:
       # Repo-level CI test credentials, intentionally exposed to PR runs; an
       # environment gate would block automated (Renovate) PR test runs.

@@ -11,6 +11,7 @@ permissions:
 jobs:
   publish:
     runs-on: windows-latest
+    timeout-minutes: 60
     # Use a GitHub environment to gate access to PSGALLERY_API_KEY behind
     # branch/reviewer protection rules. Create the `psgallery` environment in
     # repo settings and attach the secret there (remove the repo-level secret
